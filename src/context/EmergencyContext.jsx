@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import api from '../utils/api';
 
 export const EmergencyContext = createContext();
 
@@ -9,9 +10,31 @@ export const EmergencyProvider = ({ children }) => {
   const [todaySpent, setTodaySpent] = useState(0);
   const [hasRequestedToday, setHasRequestedToday] = useState(false);
   const [userStatus, setUserStatus] = useState('ACTIVE');
+  const [config, setConfig] = useState({
+    minDeposit: 500,
+    serviceFee: 5,
+    dailySpendLimit: 50,
+    requestIncrement: 50
+  });
+  const [loadingConfig, setLoadingConfig] = useState(true);
   const [transactions, setTransactions] = useState([
     { id: 1, type: 'Credit Limit', amount: 50, date: 'Just now', icon: '💰', category: 'Credit' },
   ]);
+
+  useEffect(() => {
+    fetchConfig();
+  }, []);
+
+  const fetchConfig = async () => {
+    try {
+      const res = await api.get('/config');
+      setConfig(res.data);
+    } catch (err) {
+      console.error('Failed to fetch system config', err);
+    } finally {
+      setLoadingConfig(false);
+    }
+  };
 
   useEffect(() => {
     if (pendingDue > 0) {
@@ -46,18 +69,19 @@ export const EmergencyProvider = ({ children }) => {
       return { success: false, message: "Insufficient wallet balance." };
     }
 
-    if (amount > 50) {
-      return { success: false, message: "Daily spend limit exceeded. You can only spend up to ₹50 in a single transaction." };
+    // Dynamic daily limit check
+    if (todaySpent + amount > config.dailySpendLimit) {
+      return { success: false, message: `Daily spend limit exceeded. You have already spent ₹${todaySpent} today. You can only spend ₹${config.dailySpendLimit - todaySpent} more today.` };
     }
 
-    if (todaySpent + amount > 50) {
-      return { success: false, message: `Daily spend limit exceeded. You have already spent ₹${todaySpent} today. You can only spend ₹${50 - todaySpent} more today.` };
-    }
-
+    const fee = amount * (config.serviceFee / 100);
     setWalletBalance(prev => prev - amount);
-    setPendingDue(prev => prev + amount);
+    setPendingDue(prev => prev + amount + fee);
     setTodaySpent(prev => prev + amount);
+    
     addTransaction('Spent Balance', amount, 'Debit');
+    addTransaction(`Service Fee (${config.serviceFee}%)`, fee, 'Debit');
+    
     return { success: true };
   };
 
@@ -66,8 +90,8 @@ export const EmergencyProvider = ({ children }) => {
       return { success: false, message: "Security deposit is a one-time payment. You have already made your deposit." };
     }
 
-    if (amount < 500 || amount > 1000) {
-      return { success: false, message: "Invalid deposit. Please enter an amount between 500 and 1000." };
+    if (amount < config.minDeposit) {
+      return { success: false, message: `Invalid deposit. Please enter an amount of at least ${config.minDeposit}.` };
     }
 
     setSecurityDeposit(amount);
@@ -88,7 +112,7 @@ export const EmergencyProvider = ({ children }) => {
       return { success: false, message: "You have already made a request today. Only one request is allowed per day." };
     }
 
-    const nextAmount = 50;
+    const nextAmount = config.requestIncrement;
     setWalletBalance(prev => prev + nextAmount);
     setHasRequestedToday(true);
     addTransaction('Limit Requested', nextAmount, 'Credit');

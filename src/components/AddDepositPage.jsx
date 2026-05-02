@@ -28,8 +28,8 @@ const AddDepositPage = () => {
 
   const handleProceed = () => {
     const depAmount = parseInt(amount, 10);
-    if (isNaN(depAmount) || depAmount < 500 || depAmount > 1000) {
-      alert('Please enter a valid amount between ₹500 and ₹1000.');
+    if (isNaN(depAmount) || depAmount < 500) {
+      alert('Please enter a valid amount of at least ₹500.');
       return;
     }
     if (!paymentMethod) {
@@ -67,7 +67,7 @@ const AddDepositPage = () => {
               <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🛡️</div>
               <h1 style={{ marginBottom: '8px' }}>Security Deposit</h1>
               <p style={{ color: 'var(--color-text-secondary)' }}>
-                Add a one-time deposit between ₹500 - ₹1000 to unlock your credit limits.
+                Add a one-time deposit of at least ₹500 to unlock your credit limits.
               </p>
             </div>
 
@@ -79,9 +79,14 @@ const AddDepositPage = () => {
                 placeholder="500" 
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                style={{ width: '100%', padding: '16px 16px 16px 40px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '1.5rem', fontWeight: 600, background: 'var(--color-bg)', color: 'var(--color-text)' }}
+                style={{ width: '100%', padding: '16px 16px 16px 40px', borderRadius: 'var(--radius-md)', border: amount && parseInt(amount) < 500 ? '1px solid var(--color-danger)' : '1px solid var(--color-border)', fontSize: '1.5rem', fontWeight: 600, background: 'var(--color-bg)', color: 'var(--color-text)' }}
                 autoFocus
               />
+              {amount && parseInt(amount) < 500 && (
+                <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginTop: '8px', fontWeight: 500 }}>
+                  ⚠️ Minimum security deposit is ₹500.
+                </p>
+              )}
             </div>
 
             <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>Select Payment Method</label>
@@ -108,7 +113,12 @@ const AddDepositPage = () => {
               ))}
             </div>
 
-            <Button fullWidth onClick={handleProceed} variant="primary" disabled={!amount || !paymentMethod}>
+            <Button 
+              fullWidth 
+              onClick={handleProceed} 
+              variant="primary" 
+              disabled={!amount || !paymentMethod || parseInt(amount) < 500}
+            >
               Proceed to Pay
             </Button>
             <Button fullWidth variant="ghost" onClick={() => navigate('/dashboard')} style={{ marginTop: '12px' }}>

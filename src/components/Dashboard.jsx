@@ -191,6 +191,9 @@ const Dashboard = () => {
         <div className="container">
           <div className="dashboard__section-header">
             <h2 className="dashboard__section-title">Quick Actions</h2>
+            <p className="dashboard__section-subtitle" style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+              Note: A 5% service fee applies to all emergency payments.
+            </p>
           </div>
 
           <div className="dashboard__actions fade-in-up delay-5">

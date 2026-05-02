@@ -21,4 +21,11 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Backend
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/bin/
+backend/.settings/
+backend/.project
+backend/.classpath

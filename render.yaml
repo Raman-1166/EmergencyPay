@@ -11,12 +11,10 @@ services:
   # 1. Backend Web Service (Spring Boot)
   - type: web
     name: emergencypay-backend
-    env: java
+    env: docker
     region: ohio
     plan: free
     rootDir: backend
-    buildCommand: ./mvnw clean install -DskipTests
-    startCommand: java -jar target/emergencypay-backend-1.0.jar
     envVars:
       - key: PORT
         value: 8080
@@ -36,7 +34,9 @@ services:
   # 2. Frontend Static Site (React/Vite)
   - type: web
     name: emergencypay-dashboard
-    runtime: static
+    env: static
+    region: ohio
+    plan: free
     rootDir: .
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist

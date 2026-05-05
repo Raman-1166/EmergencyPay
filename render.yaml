@@ -1,0 +1,37 @@
+# Render Blueprint for EmergencyPay
+# This file allows you to deploy both Frontend and Backend together.
+
+services:
+  # 1. Backend Web Service (Spring Boot)
+  - type: web
+    name: emergencypay-backend
+    env: docker # Using Docker is more reliable for Spring Boot on Render
+    region: ohio
+    plan: free
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: DB_URL
+        sync: false # User will provide this in Render UI
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  # 2. Frontend Static Site (React/Vite)
+  - type: static
+    name: emergencypay-dashboard
+    env: static
+    region: ohio
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: emergencypay-backend
+          property: host
+        # Note: We will manually append "/api" to this in the Render UI or code

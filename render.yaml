@@ -6,6 +6,7 @@ databases:
     databaseName: emergencypay_db
     user: emergencypay_user
     plan: free
+    region: oregon
 
 services:
   # 1. Backend Web Service (Spring Boot)

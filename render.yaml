@@ -12,7 +12,7 @@ services:
   - type: web
     name: emergencypay-backend
     env: docker
-    region: ohio
+    region: oregon
     plan: free
     rootDir: backend
     envVars:

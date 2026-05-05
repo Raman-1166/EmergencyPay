@@ -20,7 +20,7 @@ services:
         sync: false
 
   # 2. Frontend Static Site (React/Vite)
-  - type: static
+  - type: static_site
     name: emergencypay-dashboard
     env: static
     region: ohio

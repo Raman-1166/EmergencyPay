@@ -11,10 +11,12 @@ services:
   # 1. Backend Web Service (Spring Boot)
   - type: web
     name: emergencypay-backend
-    env: docker
+    env: java
     region: ohio
     plan: free
     rootDir: backend
+    buildCommand: ./mvnw clean install -DskipTests
+    startCommand: java -jar target/emergencypay-backend-1.0.jar
     envVars:
       - key: PORT
         value: 8080

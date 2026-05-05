@@ -43,8 +43,6 @@ services:
   - type: web
     name: emergencypay-dashboard
     env: static
-    region: ohio
-    plan: free
     rootDir: .
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
